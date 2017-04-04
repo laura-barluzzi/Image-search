@@ -9,8 +9,13 @@ module.exports = {
                }
     },
 
-    getJSON: function(data) {
-        var result = "exportedInformation";
-        return JSON.stringify(result);
+    getResult: function(resJson) {
+        var images = resJson.value.map(function(value) {
+        return {"image-url": value.contentUrl,
+                "alt-text": value.name,
+                "page-url": value.hostPageDisplayUrl
+               };
+        });
+        return {"images" : images}; // array
     }
 }

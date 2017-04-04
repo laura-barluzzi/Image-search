@@ -4,28 +4,30 @@ var tools = require('./tools');
 var app = express();
 
 app.get('/api/imagesearch/:search', function (req, res) {
+    // store search string and date
+    // var when = new Date()
+    // var what = req.params.search
+
     var searchPath = '/bing/v5.0/images/search?q=' + req.params.search +
-                     '&offset=' + (req.query.offset || 0);
+                     '&offset=' + (req.query.offset || 0) + '&count=5';
     var options = tools.getOptions(searchPath);
 
     https.request(options, function(httpRes){
-            var httpResData = "";
+        var httpResData = "";
 
-            httpRes.on('data', function(chuck) {
-                httpResData += chuck;
-            });
-        
-            httpRes.on('end', function() {
-                // extract what I need
-                // store data info
-                res.send(httpResData);
-            });
+        httpRes.on('data', function(chuck) {
+            httpResData += chuck;
+        });
 
-            httpRes.on('error', function (err) {
-                console.log(err);
-            });
-            
-        }).end();
+        httpRes.on('end', function() {
+            var imageObj = tools.getResult(JSON.parse(httpResData));
+            res.send(JSON.stringify(imageObj.images));
+        });
+
+        httpRes.on('error', function (err) {
+            console.log(err);
+        });
+    }).end();
 });
 
 app.get('/api/latest/imagesearch/', function (req, res) {
