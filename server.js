@@ -1,12 +1,13 @@
 var express = require('express');
 var https = require('https');
 var tools = require('./tools');
+var Store = require('./storage');
 var app = express();
+var store = new Store();
 
 app.get('/api/imagesearch/:search', function (req, res) {
-    // store search string and date
-    // var when = new Date()
-    // var what = req.params.search
+    var date = new Date();
+    store.addSearch(req.params.search, date);
 
     var searchPath = '/bing/v5.0/images/search?q=' + req.params.search +
                      '&offset=' + (req.query.offset || 0) + '&count=5';
@@ -30,8 +31,8 @@ app.get('/api/imagesearch/:search', function (req, res) {
     }).end();
 });
 
-app.get('/api/latest/imagesearch/', function (req, res) {
-   res.send('Last 10 researches done from database'); 
+app.get('/api/latest/imagesearch', function (req, res) {
+    res.send(JSON.stringify(store.getInfo())); 
 });
 
 app.listen(8080, function () {
